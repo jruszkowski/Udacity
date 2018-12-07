@@ -1,3 +1,5 @@
+#!usr/bin/env python3
+
 import psycopg2
 
 DBNAME = "news"
@@ -28,8 +30,10 @@ question_3 = "\
         a.date_notime,\
         b.bad::int::float / a.total::int::float * 100 as errors\
         from\
-        (select time::timestamp::date as date_notime,count(*) as total from log group by 1) a,\
-        (select time::timestamp::date as date_notime,count(*) as bad from log where status = '404 NOT FOUND' group by 1) b\
+        (select time::timestamp::date as date_notime,count(*) as total\
+            from log group by 1) a,\
+        (select time::timestamp::date as date_notime,count(*) as bad\
+            from log where status = '404 NOT FOUND' group by 1) b\
         where a.date_notime = b.date_notime\
         and (b.bad::int::float / a.total::int::float) > .01\
         "
@@ -42,8 +46,9 @@ def results(q):
     db.close()
     return posts
 
-def pprint(l,t=' views'):
-    if t=='% errors':
+
+def pprint(l, t=' views'):
+    if t == '% errors':
         for x in l:
             print('%s, %.2f%s' % (x[0], x[1], t))
     else:
